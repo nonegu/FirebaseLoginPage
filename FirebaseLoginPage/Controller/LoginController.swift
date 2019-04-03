@@ -11,6 +11,8 @@ import Firebase
 
 class LoginController: UIViewController {
     
+    var activityIndicator = UIActivityIndicatorView()
+    
     let inputsContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.white
@@ -40,11 +42,17 @@ class LoginController: UIViewController {
     }
     
     private func handleLogin() {
+        
+        startActivityIndicator()
+        
         guard let email = emailTextField.text, let password = passwordTextField.text else {
             print("form is not valid")
             return
         }
         Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
+            
+            self.endActivityIndicator()
+            
             if error != nil {
                 print(error!)
                 return
@@ -56,12 +64,16 @@ class LoginController: UIViewController {
     
     private func handleRegister() {
         
+        startActivityIndicator()
+        
         guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
             print("form is not valid")
             return
         }
         
         Auth.auth().createUser(withEmail: email, password: password) { (authResult, error) in
+            
+            self.endActivityIndicator()
             
             if error != nil {
                 print(error!)
@@ -86,6 +98,24 @@ class LoginController: UIViewController {
             }
             
         }
+    }
+    
+    private func startActivityIndicator() {
+        activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        
+        activityIndicator.center = self.view.center
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.style = UIActivityIndicatorView.Style.gray
+        
+        view.addSubview(activityIndicator)
+        activityIndicator.startAnimating()
+        
+        UIApplication.shared.beginIgnoringInteractionEvents()
+    }
+    
+    private func endActivityIndicator() {
+        self.activityIndicator.stopAnimating()
+        UIApplication.shared.endIgnoringInteractionEvents()
     }
     
     let loginRegisterSegmentedControl: UISegmentedControl = {
@@ -258,15 +288,13 @@ class LoginController: UIViewController {
     }
     
     
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
+    func displayAlert(title: String, message: String) {
+        let invalidAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        invalidAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
+            self.dismiss(animated: true, completion: nil)
+        }))
+        present(invalidAlert, animated: true, completion: nil)
+    }
     
 }
 
