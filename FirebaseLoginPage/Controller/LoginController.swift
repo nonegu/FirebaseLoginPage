@@ -46,7 +46,7 @@ class LoginController: UIViewController {
         startActivityIndicator()
         
         guard let email = emailTextField.text, let password = passwordTextField.text else {
-            print("form is not valid")
+            displayAlert(title: "Error", message: "Form is not valid")
             return
         }
         Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
@@ -54,7 +54,7 @@ class LoginController: UIViewController {
             self.endActivityIndicator()
             
             if error != nil {
-                print(error!)
+                self.displayAlert(title: "Error", message: error!.localizedDescription)
                 return
             } else {
                 self.dismiss(animated: true, completion: nil)
@@ -67,7 +67,7 @@ class LoginController: UIViewController {
         startActivityIndicator()
         
         guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
-            print("form is not valid")
+            displayAlert(title: "Error", message: "Form is not valid")
             return
         }
         
@@ -76,7 +76,7 @@ class LoginController: UIViewController {
             self.endActivityIndicator()
             
             if error != nil {
-                print(error!)
+                self.displayAlert(title: "Error", message: error!.localizedDescription)
                 return
             } else {
                 guard let uid = authResult?.user.uid else { return }
@@ -87,7 +87,7 @@ class LoginController: UIViewController {
                 usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
                     
                     if err != nil {
-                        print(err!)
+                        self.displayAlert(title: "Error", message: err!.localizedDescription)
                         return
                     } else {
                         self.dismiss(animated: true, completion: nil)
