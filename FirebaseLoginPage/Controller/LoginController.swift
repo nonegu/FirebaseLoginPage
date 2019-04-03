@@ -43,58 +43,77 @@ class LoginController: UIViewController {
     
     private func handleLogin() {
         
-        startActivityIndicator()
-        
-        guard let email = emailTextField.text, let password = passwordTextField.text else {
+        if emailTextField.text == "" || passwordTextField.text == "" {
             displayAlert(title: "Error", message: "Form is not valid")
-            return
-        }
-        Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
+        } else {
             
-            self.endActivityIndicator()
-            
-            if error != nil {
-                self.displayAlert(title: "Error", message: error!.localizedDescription)
-                return
+            if isValidEmail(testStr: emailTextField.text!) {
+                startActivityIndicator()
+                
+                guard let email = emailTextField.text, let password = passwordTextField.text else {
+                    displayAlert(title: "Error", message: "Form is not valid")
+                    return
+                }
+                Auth.auth().signIn(withEmail: email, password: password) { (authResult, error) in
+                    
+                    self.endActivityIndicator()
+                    
+                    if error != nil {
+                        self.displayAlert(title: "Error", message: error!.localizedDescription)
+                        return
+                    } else {
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                }
             } else {
-                self.dismiss(animated: true, completion: nil)
+                displayAlert(title: "Error", message: "Email is not valid")
             }
         }
     }
     
     private func handleRegister() {
         
-        startActivityIndicator()
-        
-        guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
+        if emailTextField.text == "" || passwordTextField.text == "" || nameTextField.text == "" {
             displayAlert(title: "Error", message: "Form is not valid")
-            return
-        }
-        
-        Auth.auth().createUser(withEmail: email, password: password) { (authResult, error) in
+        } else {
             
-            self.endActivityIndicator()
-            
-            if error != nil {
-                self.displayAlert(title: "Error", message: error!.localizedDescription)
-                return
-            } else {
-                guard let uid = authResult?.user.uid else { return }
-                //successfully authenticated user
-                let ref = Database.database().reference()
-                let usersReference = ref.child("users").child(uid)
-                let values = ["name": name, "email": email]
-                usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
+            if isValidEmail(testStr: emailTextField.text!) {
+                startActivityIndicator()
+                
+                guard let email = emailTextField.text, let password = passwordTextField.text, let name = nameTextField.text else {
+                    displayAlert(title: "Error", message: "Form is not valid")
+                    return
+                }
+                
+                Auth.auth().createUser(withEmail: email, password: password) { (authResult, error) in
                     
-                    if err != nil {
-                        self.displayAlert(title: "Error", message: err!.localizedDescription)
+                    self.endActivityIndicator()
+                    
+                    if error != nil {
+                        self.displayAlert(title: "Error", message: error!.localizedDescription)
                         return
                     } else {
-                        self.dismiss(animated: true, completion: nil)
+                        guard let uid = authResult?.user.uid else { return }
+                        //successfully authenticated user
+                        let ref = Database.database().reference()
+                        let usersReference = ref.child("users").child(uid)
+                        let values = ["name": name, "email": email]
+                        usersReference.updateChildValues(values, withCompletionBlock: { (err, ref) in
+                            
+                            if err != nil {
+                                self.displayAlert(title: "Error", message: err!.localizedDescription)
+                                return
+                            } else {
+                                self.dismiss(animated: true, completion: nil)
+                            }
+                            
+                        })
+                        
                     }
                     
-                })
-                
+                }
+            } else {
+                displayAlert(title: "Error", message: "Email is not valid")
             }
             
         }
@@ -291,9 +310,16 @@ class LoginController: UIViewController {
     func displayAlert(title: String, message: String) {
         let invalidAlert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         invalidAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
-            self.dismiss(animated: true, completion: nil)
+            invalidAlert.dismiss(animated: true, completion: nil)
         }))
         present(invalidAlert, animated: true, completion: nil)
+    }
+    
+    func isValidEmail(testStr:String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        
+        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailTest.evaluate(with: testStr)
     }
     
 }
