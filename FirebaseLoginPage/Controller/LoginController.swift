@@ -182,6 +182,7 @@ class LoginController: UIViewController {
     let emailTextField: UITextField = {
         let tf = UITextField()
         tf.placeholder = "Email"
+        tf.autocapitalizationType = UITextAutocapitalizationType.none
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
