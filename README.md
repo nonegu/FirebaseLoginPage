@@ -5,11 +5,8 @@ It is integrated with Firebase, so do not forget to install related pods and inc
 
 Register Screen
 
-![register-page](https://github.com/nonegu/FirebaseLoginPage/blob/master/register.gif)
+<img src="https://github.com/nonegu/FirebaseLoginPage/blob/master/register.gif" width="368">
 
 Login Screen
 
-![login-page](https://github.com/nonegu/FirebaseLoginPage/blob/master/login.gif)
-
-
-
+<img src="https://github.com/nonegu/FirebaseLoginPage/blob/master/login.gif" width="368">
